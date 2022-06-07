@@ -10,7 +10,7 @@ import routerQuestion from "./routes/question.route.js";
 
 
 const app = express();
-const PORT = config.get('port') || 5000;
+const PORT = process.env.PORT || config.get('port');
 
 app.use(cors);
 app.use(express.json())
