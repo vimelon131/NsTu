@@ -51,5 +51,46 @@ class teacherService {
             }
         })
     }
+
+    addTeacherByLink(link) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const pageContent = await needle("get", link);
+                const $ = cherio.load(pageContent.body, { decodeEntities: false });
+                const name = $(".page-title").text().trim();
+                const jobTitle = $(".contacts__card-post").text().trim();
+                const subjTemplates = "/edu_actions/pcources";
+                let content = await needle("get", `${link}${subjTemplates}`);
+                let $1 = cherio.load(content.body, { decodeEntities: false });
+                const table = $1('#t1').find('tr');
+                const teacher = {name, jobTitle, url: link, subjects: []};
+                table.each((i,elem)=> {
+                    if ($(elem).find('td:nth-child(3)').text().trim() == "09.04.01" || $(elem).find('td:nth-child(3)').text().trim() == "09.04.03") {
+                        teacher.subjects.push($(elem).find('td:nth-child(1)').text().trim());
+                    }
+                })
+                content = await needle("get", `${link}`);
+                $1 = cherio.load(content.body, { decodeEntities: false });
+                const imgTemp = "https://ciu.nstu.ru/kaf/";
+                teacher.img = imgTemp + $1('.contacts__card-image > img').attr("src");
+                if (teacher.subjects.length > 0) {
+                    const teacherDB = new Teacher(teacher);                                                              
+                    const teacherExists = await Teacher.findOne({name: teacher.name.trim()}).exec();
+                    if (teacherExists == null) {
+                        await teacherDB.save();
+                        console.log("Сохранено");
+                    } else {
+                        await Teacher.updateOne({_id: teacherExists._id}, {$set: teacher});
+                        console.log("Обновлено");
+                    }           
+                }
+            
+                resolve("Teachers parsed succesful");
+            } catch(e) {
+                console.log(e);
+                reject("Error occured while parsing teachers");
+            }
+        })
+    }
 }
 export default new teacherService();

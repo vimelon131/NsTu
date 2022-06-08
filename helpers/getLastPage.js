@@ -1,6 +1,4 @@
 import cherio from 'cherio';
-import { taskQueue } from '../index.js';
-import chalk from 'chalk';
 import needle from 'needle';
 
 export async function getLastPage(url) {

@@ -18,8 +18,7 @@ const SpecialitySchema = new mongoose.Schema({
     programRelevance: [String],
     employment: [String],
     trace: {type: Boolean, default: false},
-    helloWord: {type: String, default: "aasd"},
-    specRuk: {name: String, job: String, contact: String, img: String},
+    specRuk: {name: String, job: String, contact: String, img: String, helloWord: String},
     nauchRuk: [{
         name: String,
         job: String,

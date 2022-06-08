@@ -9,7 +9,7 @@ import config from 'config';
 
 const SITE = config.get('siteURL');;
 
-async function listPageHandler(url) {
+async function listPageHandler(url, keyWords) {
     try {
         const res = await needle("get", url);
         const $ = cherio.load(res.body, { decodeEntities: false });
@@ -24,7 +24,7 @@ async function listPageHandler(url) {
                 () => getNewsContent({  category 
                                         , date
                                         , url 
-                                        , title}),
+                                        , title}, keyWords),
                 (err) => {
                     if (err) {
                         throw err;
@@ -40,7 +40,7 @@ async function listPageHandler(url) {
     }
 }
 
-async function getNewsContent(newsData) {
+async function getNewsContent(newsData, keyWords) {
     try {
         const pageContent = await needle("get", `${SITE}${newsData.url}`);
         const $ = cherio.load(pageContent.body, { decodeEntities: false });
@@ -49,7 +49,8 @@ async function getNewsContent(newsData) {
             result.push($(el).html());
         });
         const content = result.toString();
-        if (contentChecker(content)) {
+        const passed = contentChecker(content, keyWords);
+        if (passed) {
             const imgs = [];
             const fotorama = $("div .fotorama");
             if (fotorama !== undefined){
@@ -64,9 +65,22 @@ async function getNewsContent(newsData) {
                 url: newsData.url,
                 content: result.toString(),
                 images: imgs.length > 0 ? imgs : null
-            });
-
-            await news.save();
+            });                                                             
+            const newsExists = await News.findOne({url: newsData.url}).exec();
+            if (newsExists == null) {
+                await news.save();
+                console.log("Сохранено");
+            } else {
+                await News.updateOne({_id: newsExists._id},{ $set: {
+                    category: newsData.category,
+                    date: newsData.date,
+                    title: newsData.title,
+                    url: newsData.url,
+                    content: result.toString(),
+                    images: imgs.length > 0 ? imgs : null
+                }});
+                console.log("Обновлено");
+            }
         }
         
     } catch (err) {

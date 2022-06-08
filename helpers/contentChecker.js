@@ -1,7 +1,9 @@
-function contentChecker(text) {
+
+
+async function contentChecker(text, keyWords) {
+    
     const textLW = text.toLowerCase();
     let cnt = 0;
-    const keyWords = ['автф', 'магистратура'];
     keyWords.forEach(el => {
         if (textLW.includes(el)) {
             cnt += 1;

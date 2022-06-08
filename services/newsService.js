@@ -7,6 +7,7 @@ import queue from 'async/queue.js';
 import listPageHandler from "../handlers/newsHandler.js";
 import { getLastPage } from "../helpers/getLastPage.js";
 import chalk from "chalk";
+import { Keyword } from "../models/Keywords.js";
 
 const concurrency = 2;
 export const taskQueue = queue(async (task, done) => {
@@ -27,7 +28,11 @@ class newsService {
     syncNews() {
         return new Promise((async (resolve, reject) => {
             try {
-                await News.deleteMany({});
+                const keys = await Keyword.find({}).exec();
+                const keyWords = [];
+                keys.map(el => {
+                    keyWords.push(el.name.toLowerCase());
+                })
                 for (let i = 1;i <=2; i++){
                     let pageURL;
                     switch (i) {
@@ -42,7 +47,7 @@ class newsService {
                     for (let i = 1; i <= lastPage;i++){
                         const url = `${pageURL}${i}`;
                         taskQueue.push(
-                            () => listPageHandler(url), 
+                            () => listPageHandler(url, keyWords), 
                             (err) => {
                                 if (err) {
                                     console.log(err);
@@ -60,6 +65,7 @@ class newsService {
             }
         })) 
     }
+
 }
 
 export default new newsService();
