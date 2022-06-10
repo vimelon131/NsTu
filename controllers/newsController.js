@@ -61,7 +61,7 @@ class newsController {
     async getKeyword(req,res) {
         try {
             const key = await Keyword.find({});
-            return res.status(key);
+            return res.json(key);
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)

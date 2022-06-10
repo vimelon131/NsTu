@@ -7,6 +7,7 @@ const GraduateSchema = new mongoose.Schema({
     job: {type: String},
     faculty: {type: String, required: true},
     img: String, 
+    fromSite: {type: Boolean, default: false}
 });
 
 export const Graduate = mongoose.model('Graduate', GraduateSchema);

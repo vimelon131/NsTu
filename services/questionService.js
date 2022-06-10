@@ -5,10 +5,10 @@ import needle from 'needle';
 import { Question } from "../models/Queistion.js";
 
 class questionService {
-    addQuestion(question, answer, date= Date.now(), mail=null) {
+    addQuestion(question) {
         return new Promise((async (resolve, reject) => {
             try {
-                const ques = new Question({name: question, answer: answer, date: date, mail: mail});
+                const ques = new Question({name: question.question, answer: question?.an, date: date, mail: mail});
                 await ques.save();
                 resolve({message: "Succesful add"})
             } catch(e) {

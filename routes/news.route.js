@@ -9,7 +9,7 @@ routerNews.post('/syncNews', newsController.syncNews);
 routerNews.post('/updateNews', newsController.updateNews);
 routerNews.post('/deleteNews', newsController.deleteNews);
 routerNews.post('/addNews', newsController.addNews);
-routerNews.post('/keywords', newsController.getKeyword);
+routerNews.get('/keywords', newsController.getKeyword);
 routerNews.post('/addKeyword', newsController.addKeyword);
 routerNews.post('/deleteKeyword', newsController.deleteKeyword);
 

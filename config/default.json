@@ -4,5 +4,6 @@
     "siteURL": "https://www.nstu.ru",
     "specsURL": "https://ciu.nstu.ru/kaf/asu/study_activity/specs/",
     "newsURL": "https://www.nstu.ru/news?page=",
-    "adsURL": "https://www.nstu.ru/announcements?page="
+    "adsURL": "https://www.nstu.ru/announcements?page=",
+    "staticPath": ".\\static"
 }

@@ -7,13 +7,16 @@ import cors from "./middleware/cors.middleware.js";
 import routerTeacher from "./routes/teacher.route.js";
 import routerGraduates from "./routes/graduates.route.js";
 import routerQuestion from "./routes/question.route.js";
+import fileUpload from "express-fileupload";
 
 
 const app = express();
 const PORT = process.env.PORT || config.get('port');
 
+app.use(fileUpload({}));
 app.use(cors);
 app.use(express.json())
+app.use(express.static('static'));
 app.use('/api',routerNews);
 app.use('/api',routerSpec);
 app.use('/api',routerTeacher);

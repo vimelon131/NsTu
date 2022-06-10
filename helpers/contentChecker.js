@@ -1,6 +1,6 @@
 
 
-async function contentChecker(text, keyWords) {
+function contentChecker(text, keyWords) {
     
     const textLW = text.toLowerCase();
     let cnt = 0;
