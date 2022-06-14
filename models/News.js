@@ -4,7 +4,7 @@ const NewsSchema = new mongoose.Schema({
     category: { type: String, required: true },
     date: {type: Date, required: true},
     title: {type: String, required: true, index: true},
-    url: {type: String, unique: true},
+    url: {type: String},
     content: {type: String, required: true},
     images: [
        String 

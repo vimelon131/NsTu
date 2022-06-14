@@ -1,5 +1,7 @@
 import { Speciality } from "../models/Speciality.js";
 import specService from "../services/specService.js";
+import needle from 'needle';
+import config from 'config';
 
 class specsController {
     async getSpecs(req,res) {
@@ -24,7 +26,7 @@ class specsController {
         try {
             const {_id, ...info} = req.body;
             const spec = await Speciality.updateOne({_id: _id},{ $set: info})
-            return res.status(spec);
+            return res.json(spec);
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)
@@ -33,9 +35,10 @@ class specsController {
 
     async syncSpecs(req, res) {
         try {
-            await specService.syncSpecs();
-            const specs = Speciality.find({});
-            return res.status(specs);
+            const pageContent = await needle("get", config.get('specsURL'));
+            await specService.syncSpecs(pageContent);
+            const specs = await Speciality.find({}).exec();
+            return res.json(specs);
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)
@@ -45,7 +48,7 @@ class specsController {
         try {
             const {_id} = req.body;
             const delSpec = await Speciality.findOne({_id: _id}).remove();
-            return res.status(delSpec);
+            return res.json({...delSpec, _id: _id});
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)

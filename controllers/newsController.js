@@ -31,7 +31,7 @@ class newsController {
         try {
             const {_id, title, date, category, content} = req.body;
             const upd = await News.updateOne({_id: _id},{ $set: {title, date, category, content}});
-            return res.status(upd);
+            return res.json(upd);
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)
@@ -40,9 +40,14 @@ class newsController {
 
     async syncNews(req, res) {
         try {
-            await newsService.syncNews();
-            const news = await News.find({});
-            return res.status(news);
+            const keys = await Keyword.find({}).exec();
+            const keyWords = [];
+            keys.map(el => {
+                keyWords.push(el.name.toLowerCase());
+            })
+            await newsService.syncNews(keyWords);
+            const news = await News.find({}).exec();
+            return res.json(news);
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)
@@ -52,7 +57,7 @@ class newsController {
         try {
             const {_id} = req.body;
             const delNews = await News.findOne({_id: _id}).remove();
-            return res.status(delNews);
+            return res.json({...delNews, _id: _id});
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)
@@ -72,7 +77,7 @@ class newsController {
             const {keyword} = req.body;
             const keyW = new Keyword({name: keyword});
             const key = await keyW.save();
-            return res.status(key);
+            return res.json(key);
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)
@@ -82,7 +87,7 @@ class newsController {
         try {
             const {_id} = req.body;
             const keyword = await Keyword.findOne({_id:_id}).remove();
-            return res.status(keyword);
+            return res.json({_id: _id, keyword});
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)

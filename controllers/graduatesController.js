@@ -2,6 +2,7 @@ import graduateService from "../services/graduateService.js";
 import { Graduate } from "../models/Graduates.js";
 import { v4 as uuidv4 } from 'uuid';
 import config from 'config';
+import needle from 'needle';
 
 class graduatesController {
     async getGraduates(req, res) {
@@ -15,8 +16,9 @@ class graduatesController {
     }
     async syncGraduates(req, res) {
         try {
-            await graduateService.syncGraduates();
-            const graduate = await Graduate.find({});
+            const pageContent = await needle("get", `https://www.nstu.ru/alumnus/success_stories`);
+            await graduateService.syncGraduates(pageContent);
+            const graduate = await Graduate.find({}).exec()
             return res.json(graduate);
         } catch(e) {
             console.log(e);
@@ -49,7 +51,7 @@ class graduatesController {
                 info.img = avatartName;
             } 
             const upd = await Graduate.updateOne({_id: _id},{ $set: {...info}});
-            return res.status(upd);
+            return res.json(upd);
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)
@@ -58,8 +60,8 @@ class graduatesController {
     async deleteGraduates(req,res) {
         try {
             const {_id} = req.body;
-            const delNews = await Graduate.findOne({_id: _id}).remove();
-            return res.status(delNews);
+            const delGrad = await Graduate.findOne({_id: _id}).remove();
+            return res.json({_id: _id, ...delGrad});
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)

@@ -1,5 +1,6 @@
 import { Teacher } from "../models/Teacher.js";
 import teacherService from "../services/teacherService.js";
+import needle from 'needle';
 
 class teacherController {
     async getTeachers(req,res) {
@@ -14,9 +15,10 @@ class teacherController {
 
     async syncTeachers(req,res) {
         try {
-            await teacherService.syncTeachers();
-            const teachers = await Teacher.find({});
-            return res.status(teachers);
+            const pageContent = await needle("get", `https://ciu.nstu.ru/kaf/asu/about/persons`);
+            await teacherService.syncTeachers(pageContent);
+            const teachers = await Teacher.find({}).exec();
+            return res.json(teachers);
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)
@@ -35,9 +37,10 @@ class teacherController {
     async addTeacherLink(req,res) {
         try {
             const {link} = req.body; 
-            await teacherService.addTeacherByLink(link);
+            const pageContent = await needle("get", link);
+            await teacherService.addTeacherByLink(pageContent,link);
             const teachers = await Teacher.find({});
-            return res.status(teachers);
+            return res.json(teachers);
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)
@@ -47,7 +50,7 @@ class teacherController {
         try {
             const {_id} = req.body;
             const delTeacher = await Teacher.findOne({_id: _id}).remove();
-            return res.status(delTeacher);
+            return res.json({...delTeacher, _id: _id});
         } catch(e) {
             console.log(e);
             return res.status(400).json(e)
